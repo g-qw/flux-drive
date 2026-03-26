@@ -1,0 +1,59 @@
+export org.cloud.fs.entity.File
+    -> package org.cloud.fs.dto
+FileView {
+    #allScalars(File)
+    -userId
+    -bucket
+    -storageKey
+}
+
+FileRpcView {
+    #allScalars
+}
+
+DeletedFileView {
+    id
+    directoryId
+    name
+    deletedAt
+}
+
+input FileInput {
+    directoryId
+    bucket
+    storageKey
+    name
+    mimeType
+    size
+    md5
+}
+
+input FileRenameInput {
+    id
+    name
+}
+
+input FileRecoverInput {
+    id
+    directoryId
+}
+
+input FileCopyInput {
+    id
+    directoryId
+}
+
+input FileMoveInput {
+    id
+    directoryId
+}
+
+specification FileSpecification {
+    eq(directoryId)
+    like/i(name)
+    ge(size),
+    le(size),
+    notNull(deletedAt)
+    ge(updatedAt)
+    le(updatedAt)
+}

@@ -1,0 +1,65 @@
+server:
+  port: 8101
+
+spring:
+  application:
+    name: file-system
+  profiles:
+    default: dev
+
+jimmer:
+  dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
+  show-sql: true
+  pretty-sql: true
+  client:
+    ts:
+      path: /ts.zip
+    openapi:
+      path: /openapi.json
+      ui-path: /openapi.html
+      properties:
+        info:
+          title: Minio 虚拟文件系统
+          description: 存储文件对象的元数据和目录数据
+          version: 1.0
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-request-duration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    org.cloud.fs.service: DEBUG
+
+    # 关闭远程方法调用日志
+    sun.rmi: OFF
+    javax.management.remote.rmi: OFF
+
+    # 数据库日志：连接泄漏、慢 SQL、超时
+    com.zaxxer.hikari: WARN
+    com.zaxxer.hikari.HikariConfig: INFO
+    org.springframework.jdbc: DEBUG
+    org.springframework.jdbc.datasource.DataSourceUtils: INFO
+
+    # Nacos 日志
+    com.alibaba.nacos: WARN
+
+    # Dubbo 日志
+    org.apache.dubbo: WARN

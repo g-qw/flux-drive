@@ -1,0 +1,60 @@
+### 单文件上传
+POST http://{{fu.base_url}}/upload/file?bucketName={{user_meta.userId}}&objectName=%2F1024.dat
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="1024.dat"
+Content-Type: application/octet-stream
+
+< ./1024.dat
+--WebAppBoundary--
+
+### 多文件上传
+POST http://{{fu.base_url}}/upload/files?bucketName={{user_meta.userId}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="files"; filename="/1024.dat"
+Content-Type: application/octet-stream
+
+< ./1024.dat
+--WebAppBoundary--
+
+### 初始化分块上传
+POST http://{{fu.base_url}}/upload/multipart/init
+Content-Type: application/json
+
+{
+  "bucketName": "{{user_meta.userId}}",
+  "objectName": "/large.mp4",
+  "contentType": "video/mp4"
+}
+
+### 分块1上传
+POST http://{{fu.base_url}}/upload/multipart/part?bucketName={{user_meta.userId}}&objectName=%2Flarge.mp4&partNumber=1&uploadId={{fu.upload_id}}
+Content-Type: application/octet-stream
+
+< large.mp4.part0
+
+### 分块2上传
+POST http://{{fu.base_url}}/upload/multipart/part?bucketName={{user_meta.userId}}&objectName=%2Flarge.mp4&partNumber=2&uploadId={{fu.upload_id}}
+Content-Type: application/octet-stream
+
+< large.mp4.part1
+
+### 分块3上传
+POST http://{{fu.base_url}}/upload/multipart/part?bucketName={{user_meta.userId}}&objectName=%2Flarge.mp4&partNumber=3&uploadId={{fu.upload_id}}
+Content-Type: application/octet-stream
+
+< large.mp4.part2
+
+### 分块合并
+POST http://{{fu.base_url}}/upload/multipart/complete
+Content-Type: application/json
+
+{
+  "bucketName": "{{user_meta.userId}}",
+  "objectName": "/large.mp4",
+  "uploadId": "NWEwYmY4ZjMtY2M2ZC00OWNlLWFhYmMtNTA5YjcwZjc3M2UwLjZkNDIwOTQwLWU4NzQtNGE0ZC04ZDMyLTgwYTBlN2EzOWJhNHgxNzUzOTQwMDQyNjMyNTIwMjAw",
+  "contentType": "video/mp4"
+}

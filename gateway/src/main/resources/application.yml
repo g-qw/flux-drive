@@ -1,0 +1,80 @@
+server:
+  address: 0.0.0.0
+  port: 75
+
+spring:
+  profiles:
+    default: dev
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway
+  thymeleaf:
+    cache: true
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/user/**, /user-service/v3/api-docs
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /${segment}
+
+        - id: file-system
+          uri: lb://file-system
+          predicates:
+            - Path=/api/v1/fs/**, /file-system/v3/api-docs
+          filters:
+            - RewritePath=/file-system/(?<segment>.*), /${segment}
+
+        - id: storage-service
+          uri: lb://storage-service
+          predicates:
+            - Path=/api/v1/storage/**, /storage-service/v3/api-docs
+          filters:
+            - RewritePath=/storage-service/(?<segment>.*), /${segment}
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-request-duration: true
+    # 聚合各服务的文档
+    urls:
+      - name: user-service
+        url: /user-service/v3/api-docs
+      - name: file-system
+        url: /file-system/v3/api-docs
+      - name: storage-service
+        url: /storage-service/v3/api-docs
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+jwt:
+  secret: ${JWT_SECRET:}
+
+app:
+  cors:
+    allowed-origins:
+      - "http://localhost"
+      - "http://localhost:75"
+      - "http://localhost:5173"
+      - "http://localhost:8100"
+      - "http://localhost:8101"
+      - "http://localhost:8102"
+
+logging:
+  level:
+    root: INFO

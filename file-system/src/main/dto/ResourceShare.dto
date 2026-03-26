@@ -1,0 +1,14 @@
+export org.cloud.fs.entity.ResourceShare
+    -> package org.cloud.fs.dto
+
+ShareView {
+    id
+    code
+    accessType
+    expireAt
+    requirePassword
+    status
+    title
+    description
+    createdAt
+}

@@ -1,0 +1,409 @@
+services:
+  postgres:
+    image: postgres:15.17
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: Asia/Shanghai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+      - ./init/pgsql_db_init.sql:/docker-entrypoint-initdb.d/pgsql_db_init.sql
+    expose:
+      - "5432"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  redis:
+    image: redis:7.4.8
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD} --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "6379"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  nacos:
+    image: nacos/nacos-server:v2.5.1
+    container_name: nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: derby
+      JVM_XMS: 1g
+      JVM_XMX: 1g
+      JVM_XMN: 512m
+      TZ: Asia/Shanghai
+    volumes:
+      - nacos_logs:/home/nacos/logs
+      - ./nacos/nacos-logback.xml:/home/nacos/conf/nacos-logback.xml:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8848:8848"
+    expose:
+      - "9848"
+      - "9849"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8848/nacos/v1/console/health/readiness >/dev/null && curl -sf http://localhost:8848/nacos/v1/console/health/liveness >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  minio:
+    image: minio/minio:RELEASE.2025-01-18T00-31-37Z
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      TZ: Asia/Shanghai
+    volumes:
+      - minio_data:/data
+      - /etc/localtime:/etc/localtime:ro
+    expose:
+      - "9000"
+    ports:
+      - "9001:9001"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  directus:
+    image: directus/directus:11
+    container_name: directus
+    restart: unless-stopped
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      DB_CLIENT: pg
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+
+      # 其他配置
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "*"
+      TZ: Asia/Shanghai
+      LOG_LEVEL: info
+    expose:
+      - "8055"
+    volumes:
+      - directus_uploads:/directus/uploads
+    networks:
+      - backend-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8055/server/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  nginx:
+    image: nginx:1.26-alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/dist:/usr/share/nginx/html:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/health | grep -q healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: gateway
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      TZ: Asia/Shanghai
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=60.0
+        -XX:MaxMetaspaceSize=64m
+        -Xss256k
+    ports:
+      - "75:75"
+    volumes:
+      - gateway_logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend-network
+    depends_on:
+      nacos:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:75/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    container_name: user-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      TZ: Asia/Shanghai
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=75.0
+        -XX:MaxMetaspaceSize=128m
+        -Xss512k
+    expose:
+      - "8100"
+    volumes:
+      - user_logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8100/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  file-system:
+    build:
+      context: .
+      dockerfile: file-system/Dockerfile
+    container_name: file-system
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      TZ: Asia/Shanghai
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=75.0
+        -XX:MaxMetaspaceSize=128m
+        -Xss512k
+    expose:
+      - "8101"
+    volumes:
+      - fs_logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 1GB
+        reservations:
+          memory: 512M
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8101/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  storage-service:
+    build:
+      context: .
+      dockerfile: storage-service/Dockerfile
+    container_name: storage-service
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+      TZ: Asia/Shanghai
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=25.0
+        -XX:MaxDirectMemorySize=2g
+        -Dreactor.netty.ioWorkerCount=16
+    expose:
+      - "8102"
+    volumes:
+      - storage_logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - backend-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 4GB
+        reservations:
+          memory: 1GB
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost:8102/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+# 数据卷定义
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  nacos_logs:
+    driver: local
+  minio_data:
+    driver: local
+  directus_uploads:
+    driver: local
+  gateway_logs:
+    driver: local
+  user_logs:
+    driver: local
+  fs_logs:
+    driver: local
+  storage_logs:
+    driver: local
+
+# 网络配置
+networks:
+  backend-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

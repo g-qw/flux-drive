@@ -1,0 +1,64 @@
+server:
+  port: 8100
+
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
+
+jimmer:
+  dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect
+  show-sql: true
+  pretty-sql: true
+  client:
+    ts:
+      path: /ts.zip
+    openapi:
+      path: /openapi.json
+      ui-path: /openapi.html
+      properties:
+        info:
+          title: 用户服务
+          description: 用户注册、登录，身份验证等等
+          version: 1.0
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-request-duration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    org.cloud.user.service: DEBUG
+
+    # 关闭远程方法调用日志
+    sun.rmi: OFF
+    javax.management.remote.rmi: OFF
+
+    # 数据库日志：连接泄漏、慢 SQL、超时
+    com.zaxxer.hikari: WARN
+    com.zaxxer.hikari.HikariConfig: INFO
+    org.springframework.jdbc: DEBUG
+    org.springframework.jdbc.datasource.DataSourceUtils: INFO
+
+    # Nacos 日志
+    com.alibaba.nacos: WARN
+
+    # Dubbo 日志
+    org.apache.dubbo: WARN

@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/cloud_storage_cluster
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:8848
+      discovery:
+        service: ${spring.application.name}
+      config:
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        import-check:
+          enabled: false
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      database: 2
+
+dubbo:
+  application:
+    name: ${spring.application.name}-dubbo
+    qos-enable: false
+  registry:
+    address: nacos://${spring.cloud.nacos.server-addr}
+    register-mode: instance
+  consumer:
+    timeout: 3000
+    check: false
+  protocol:
+    name: dubbo
+    port: -1
+
+gateway:
+  port: 75

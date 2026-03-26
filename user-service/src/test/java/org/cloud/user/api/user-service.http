@@ -1,0 +1,109 @@
+
+### 邮箱验证
+POST http://{{user.base_url}}/verify
+Content-Type: application/json
+
+{
+  "email": "{{user_meta.email}}"
+}
+
+### 检查邮箱是否已注册
+GET http://{{user.base_url}}/check-email
+Content-Type: application/json
+
+{
+  "email": "{{user_meta.email}}"
+}
+
+### 用户注册
+POST http://{{user.base_url}}/register
+Content-Type: application/json
+
+{
+  "email": "{{user_meta.email}}",
+  "password": "123456",
+  "code": "HZJAy8"
+}
+
+### 用户登录
+POST http://{{user.base_url}}/login
+Content-Type: application/json
+
+{
+  "email": "{{user_meta.email}}",
+  "password":"123456",
+  "code": "qyDUPp"
+}
+
+
+### 注销登录
+POST http://{{user.base_url}}/logout
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 强制登出设备
+POST http://{{user.base_url}}/sessions/revoke-all
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 重置密码
+POST http://{{user.base_url}}/reset-pwd
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "email": "{{user_meta.email}}",
+  "code": "ZNYpig",
+  "newPassword": "123456"
+}
+
+### 更新密码
+POST http://{{user.base_url}}/update-pwd
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "email": "{{user_meta.email}}",
+  "password": "123456",
+  "newPassword": "123456"
+}
+
+### 更新用户信息
+POST http://{{user.base_url}}/update-info
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "bio": "热爱分享的小仓鼠",
+  "avatar": ""
+}
+
+### 查询用户信息
+GET http://{{user.base_url}}//user-info
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 查询已使用存储容量
+GET http://{{user.base_url}}/used_capacity?userId={{user_meta.userId}}
+
+### 查询用户状态
+GET http://{{user.base_url}}/status?userId={{user_meta.userId}}
+
+### 上传头像
+POST http://{{user.base_url}}/upload_avatar
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="userId"
+Content-Type: text/plain
+
+{{user_meta.userId}}
+--WebAppBoundary
+Content-Disposition: form-data; name="avatar"; filename="avatar.png"
+Content-Type: image/png
+
+< ./avatar.png
+--WebAppBoundary--

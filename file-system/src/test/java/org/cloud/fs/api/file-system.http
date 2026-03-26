@@ -1,0 +1,177 @@
+
+### 查询根目录
+GET http://{{fs.base_url}}/dir
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 获取目录信息
+GET http://{{fs.base_url}}/dir/{{user_meta.root_dir}}
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+
+### 加载目录树数据
+GET http://{{fs.base_url}}/dir/{{user_meta.root_dir}}/node
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+
+### 获取目录内容
+GET http://{{fs.base_url}}/dir/{{user_meta.root_dir}}/content
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 获取目录层级路径
+POST http://{{fs.base_url}}/dir/path
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "path": "/dir1/dir2/dir3/dir4"
+}
+
+
+### 创建目录
+POST http://{{fs.base_url}}/dir/create
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "parentId": "a70615db-8d27-451a-8e28-17d326ffcf72",
+  "name": "dir5"
+}
+
+
+### 重命名目录
+POST http://{{fs.base_url}}/dir/rename
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "id": "000a9a46-acc1-4701-a7fb-ee4371d44305",
+  "name": "Document"
+}
+
+### 批量删除目录
+POST http://{{fs.base_url}}/dir/delete
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "directoryIds": [
+    "ccce3fe1-9265-446e-8937-ae6f68eafb0e"
+  ]
+}
+
+### 批量恢复目录
+POST http://{{fs.base_url}}/dir/recover
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "directoryIds": [
+    "ccce3fe1-9265-446e-8937-ae6f68eafb0e"
+  ]
+}
+
+### 批量移动目录
+POST http://{{fs.base_url}}/dir/move
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "directoryIds": [
+    "839dfb03-1446-47eb-9062-3522a556596f"
+  ],
+  "parentId": "1a9db51f-7711-49e7-9a99-f1d9bb0f0904"
+}
+
+
+### 获取文件
+GET http://{{fs.base_url}}/file/9e1a60e0-89b5-4c16-bc36-728fb97ff04e
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+### 创建文件
+POST http://{{fs.base_url}}/file/create
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "directoryId": "{{user_meta.root_dir}}",
+  "storageKey": "storageKey",
+  "name": "1024.txt",
+  "mimeType": "text",
+  "size": 1024,
+  "md5": "xxx"
+}
+
+### 重命名文件
+POST http://{{fs.base_url}}/file/rename
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "id": "9e1a60e0-89b5-4c16-bc36-728fb97ff04e",
+  "name": "test.txt"
+}
+
+### 批量删除文件
+POST http://{{fs.base_url}}/file/delete
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "fileIds": [
+    "9e1a60e0-89b5-4c16-bc36-728fb97ff04e"
+  ]
+}
+
+### 批量恢复文件
+POST http://{{fs.base_url}}/file/recover
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "fileIds": [
+    "9e1a60e0-89b5-4c16-bc36-728fb97ff04e"
+  ],
+  "targetDirectoryId": "5ea9f27e-d1ad-4bbf-aa20-f2cf164f0a5f"
+}
+
+
+### 批量复制文件
+POST http://{{fs.base_url}}/file/copy
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "fileIds": [
+    "9e1a60e0-89b5-4c16-bc36-728fb97ff04e"
+  ],
+  "targetDirectoryId": "5ea9f27e-d1ad-4bbf-aa20-f2cf164f0a5f"
+}
+
+### 批量移动文件
+POST http://{{fs.base_url}}/file/move
+Content-Type: application/json
+Authorization: Bearer {{user_meta.token}}
+UID: {{user_meta.id}}
+
+{
+  "fileIds": [
+    "9e1a60e0-89b5-4c16-bc36-728fb97ff04e"
+  ],
+  "targetDirectoryId": "000a9a46-acc1-4701-a7fb-ee4371d44305"
+}

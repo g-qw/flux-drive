@@ -1,0 +1,11 @@
+export org.cloud.storage.entity.FileProcessingTask
+    -> package org.cloud.storage.dto
+
+input FileProcessingTaskInput {
+    fileId
+    userId
+    md5
+    bucket
+    storageKey
+    taskType
+}

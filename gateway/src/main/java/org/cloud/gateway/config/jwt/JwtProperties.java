@@ -1,0 +1,16 @@
+package org.cloud.gateway.config.jwt;
+
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+@Data
+@Component
+@ConfigurationProperties(prefix = "jwt")
+public class JwtProperties {
+
+    /**
+     * JWT 密钥（至少256位，即32字符）
+     */
+    private String secret;
+}

@@ -1,0 +1,50 @@
+server:
+  port: 8102
+
+spring:
+  application:
+    name: storage-service
+  main:
+    web-application-type: reactive
+  profiles:
+    default: dev
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    display-request-duration: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    root: info
+    org.cloud.storage.service: DEBUG
+
+    # 关闭远程方法调用日志
+    sun.rmi: OFF
+    javax.management.remote.rmi: OFF
+
+    # 数据库日志：连接泄漏、慢 SQL、超时
+    com.zaxxer.hikari: WARN
+    com.zaxxer.hikari.HikariConfig: INFO
+    org.springframework.jdbc: DEBUG
+    org.springframework.jdbc.datasource.DataSourceUtils: INFO
+
+    # Nacos 日志
+    com.alibaba.nacos: WARN
+
+    # Dubbo 日志
+    org.apache.dubbo: WARN

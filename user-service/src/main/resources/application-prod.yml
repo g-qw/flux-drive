@@ -1,0 +1,61 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    nacos:
+      server-addr: nacos:8848
+      discovery:
+        service: ${spring.application.name}
+      config:
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        import-check:
+          enabled: false
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      database: 1
+  mail:
+    host: smtp.163.com
+    port: 587
+    username: passfort@163.com
+    password: ${MAIL_PASSWORD:}
+    protocol: smtp
+    default-encoding: UTF-8
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          starttls:
+            enable: false
+
+dubbo:
+  application:
+    name: ${spring.application.name}-dubbo
+    qos-enable: false
+  registry:
+    address: nacos://${spring.cloud.nacos.server-addr}
+    register-mode: instance
+  consumer:
+    timeout: 3000
+    check: false
+  protocol:
+    name: dubbo
+    port: -1
+
+jwt:
+  secret: ${JWT_SECRET:}
+  issuer: user-service
+  expiration: 604800  # 7天
+  refresh-threshold: 300
+
+gateway:
+  port: 75

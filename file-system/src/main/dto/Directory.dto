@@ -1,0 +1,68 @@
+export org.cloud.fs.entity.Directory
+    -> package org.cloud.fs.dto
+
+DirectoryView {
+    id
+    directories {
+        #allScalars(Directory)
+        -userId
+    }
+    files {
+        #allScalars(File)
+        -userId
+        -storageKey
+    }
+}
+
+DirectoryNodeView {
+    id
+    name
+}
+
+DirectoryInfoView {
+    id
+    parentId
+    name
+    createdAt
+    updatedAt
+    size
+}
+
+DeletedDirectoryView {
+    id
+    name
+    deletedAt
+}
+
+input DirectoryInput {
+    parentId
+    name
+}
+
+input DirectoryRecoverInput {
+    id
+    parentId
+}
+
+input DirectoryRenameInput {
+    id
+    name
+}
+
+input DirectoryMoveInput {
+    id
+    parentId
+}
+
+specification DirectorySpecification {
+    eq(parentId)
+    eq(userId)
+    like/i(name)
+    notNull(deletedAt)
+    ge(createdAt)
+    le(createdAt)
+    ge(updatedAt)
+    le(updatedAt)
+    ge(size)
+    le(size)
+}

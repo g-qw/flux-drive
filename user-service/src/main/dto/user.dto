@@ -1,0 +1,12 @@
+export org.cloud.user.entity.User
+    -> package org.cloud.user.dto
+
+UserView {
+    #allScalars
+    -pwd
+}
+
+UserSearchView {
+    id
+    username
+}

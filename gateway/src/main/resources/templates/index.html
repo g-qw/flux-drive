@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/gateway.ico" type="image/x-icon">
+    <title>Gateway Home</title>
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            color: #666;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+            font-weight: bold;
+        }
+        .predicate {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+        .predicate li {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+        .predicate li::before {
+            content: '\2022'; /* 添加项目符号 */
+            color: #4CAF50;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+            }
+            h1 {
+                font-size: 20px;
+            }
+            table {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Gateway Home</h1>
+    <p>Welcome to the Gateway! The following routes are currently active:</p>
+    <table>
+        <thead>
+        <tr>
+            <th>Route ID</th>
+            <th>URI</th>
+            <th>Predicates</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="route : ${routes}">
+            <td th:text="${route.getId()}"></td>
+            <td th:text="${route.getUri()}"></td>
+            <td>
+                <ul class="predicate">
+                    <li th:each="predicate : ${route.getPredicates()}" th:text="${predicate.getName() + ': ' + predicate.getArgs().values().iterator().next()}"></li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

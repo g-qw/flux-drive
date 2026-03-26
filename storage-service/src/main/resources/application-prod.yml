@@ -1,0 +1,66 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    nacos:
+      server-addr: nacos:8848
+      discovery:
+        service: ${spring.application.name}
+      config:
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        import-check:
+          enabled: false
+
+  data:
+    redis:
+      host: redis
+      port: 6379
+      password: ${REDIS_PASSWORD}
+      database: 3
+  codec:
+    max-in-memory-size: 32MB
+
+dubbo:
+  application:
+    name: ${spring.application.name}-dubbo
+    qos-enable: false
+  registry:
+    address: nacos://${spring.cloud.nacos.server-addr}
+    register-mode: instance
+  consumer:
+    timeout: 3000
+    check: false
+  protocol:
+    name: dubbo
+    port: -1
+
+minio:
+  endpoint: http://minio:9000
+  access-key: ${MINIO_ACCESS_KEY:}
+  secret-key: ${MINIO_SECRET_KEY:}
+  server-url: ${MINIO_SERVER_URL:}
+
+transfer:
+  multi-file-config:
+    memory-threshold: 5242880
+    stream-threshold: 104857600
+    file-timeout-minutes: 5
+    batch-timeout-minutes: 10
+    stream-prefetch: 4
+    overflow-strategy: "DROP_OLDEST"
+  chunked-upload-config:
+    max-chunk-size-bytes: 10485760
+    chunk-timeout-minutes: 1
+  download-config:
+    stream-buffer-size-bytes: 16384
+    max-chunk-size-bytes: 10485760
+    max-zip-batch-size-bytes: 1073741824
+    zip-packaging-timeout-minutes: 10
+
+
+gateway:
+  port: 75
