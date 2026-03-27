@@ -38,6 +38,5 @@ public interface File {
 
     @ManyToOne
     @JoinColumn(name = "directory_id")
-    @OnDissociate(DissociateAction.DELETE) // 目录删除时级联删除文件（双向配置）
     Directory directory();
 }

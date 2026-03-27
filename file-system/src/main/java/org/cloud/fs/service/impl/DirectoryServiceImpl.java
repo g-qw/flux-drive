@@ -218,6 +218,19 @@ public class DirectoryServiceImpl implements DirectoryService {
             throw new AccessDeniedException();
         }
 
+        // 删除目录下的所有文件
+        int deletedFilesCount = fileRepository.deleteFilesByDirectoryIds(directoryIds);
+
+        // 删除所有后代目录
+        List<UUID> subDirectoryIds = directoryRepository.listDescendantIds(directoryIds);
+        if(!subDirectoryIds.isEmpty()) {
+            directoryRepository.deleteDirectories(subDirectoryIds);
+
+            // 删除所有后代目录的文件
+            fileRepository.deleteFilesByDirectoryIds(subDirectoryIds);
+        }
+
+        // 删除目录
         int affectedRowCount = directoryRepository.deleteDirectories(directoryIds);
 
         log.debug("[deleteDirectories] directoryIds={}, userId={}", directoryIds, userId);
