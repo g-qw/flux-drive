@@ -262,6 +262,7 @@ services:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
+      OPENAPI_PROD_URL: ${OPENAPI_PROD_URL}
       TZ: Asia/Shanghai
       JAVA_OPTS: >-
         -XX:MaxRAMPercentage=75.0
@@ -310,6 +311,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
+      OPENAPI_PROD_URL: ${OPENAPI_PROD_URL}
       TZ: Asia/Shanghai
       JAVA_OPTS: >-
         -XX:MaxRAMPercentage=75.0
@@ -361,6 +363,7 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+      OPENAPI_PROD_URL: ${OPENAPI_PROD_URL}
       TZ: Asia/Shanghai
       JAVA_OPTS: >-
         -XX:MaxRAMPercentage=25.0
