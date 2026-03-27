@@ -50,6 +50,11 @@ public interface DirectoryService {
     int deleteDirectories(List<UUID> directoryIds, UUID userId);
 
     /**
+     * 批量删除目录（物理删除），通常用于清理软删除后过期的目录
+     */
+    int deleteDirectoriesPhysically(List<UUID> directoryIds, UUID userId);
+
+    /**
      * 批量恢复目录
      */
     int recoverDirectories(List<UUID> directoryIds, UUID userId);

@@ -113,6 +113,27 @@ services:
         max-size: "10m"
         max-file: "1"
 
+  rabbitmq:
+    image: rabbitmq:3.12.14-management-alpine
+    container_name: rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    expose:
+      - "5672"
+    ports:
+      - "15672:15672"
+    networks:
+      - backend-network
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   directus:
     image: directus/directus:11
     container_name: directus
@@ -388,6 +409,8 @@ volumes:
   nacos_logs:
     driver: local
   minio_data:
+    driver: local
+  rabbitmq_data:
     driver: local
   directus_uploads:
     driver: local

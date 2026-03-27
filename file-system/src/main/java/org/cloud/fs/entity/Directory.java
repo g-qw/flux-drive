@@ -33,14 +33,16 @@ public interface Directory {
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    @OnDissociate(DissociateAction.LAX)
+    @OnDissociate(DissociateAction.LAX) // // 父目录删除时，不处理
     @Nullable
     Directory parent();
 
     @OneToMany(mappedBy = "parent", orderedProps = @OrderedProp("name"))
+    @OnDissociate(DissociateAction.DELETE) // 删除目录时级联删除子目录
     List<Directory> directories();
 
     @OneToMany(mappedBy = "directory", orderedProps = @OrderedProp("name"))
+    @OnDissociate(DissociateAction.DELETE) // 删除目录时级联删除文件
     List<File> files();
 }
 

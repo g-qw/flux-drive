@@ -97,6 +97,21 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
+     * 批量删除文件（物理删除）
+     *
+     * @param fileIds 文件ID列表
+     * @param userId  文件所属用户的 ID
+     * @return 成功删除的文件数量
+     */
+    public int deleteFilesPhysically(List<UUID> fileIds, UUID userId) {
+        if(fileRepository.notOwns(userId, fileIds)) {
+            throw new AccessDeniedException();
+        }
+
+        return fileRepository.deleteFilesPhysically(fileIds);
+    }
+
+    /**
      * 批量恢复文件
      *
      * @param fileIds   文件ID

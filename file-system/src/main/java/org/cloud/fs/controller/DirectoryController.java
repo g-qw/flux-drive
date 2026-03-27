@@ -141,11 +141,19 @@ public class DirectoryController {
     }
 
     @PostMapping("/delete")
-    @Operation(summary = "批量删除目录(软删除)", description = "删除多个目录，被删除目录下的子文件、子目录也将被递归地标记为删除状态")
+    @Operation(summary = "批量删除目录(软删除)", description = "将多个目录标记为删除状态，被删除目录下的子文件、子目录也将被递归地标记为删除状态")
     ApiResponse<Integer> deleteDirectories(
             @RequestBody @Validated DirectoriesDeleteRequest request,
             @Parameter(description = "用户 ID") @RequestHeader("UID") UUID uid) {
         return ApiResponse.success(directoryService.deleteDirectories(request.getDirectoryIds(), uid));
+    }
+
+    @PostMapping("/delete/physical")
+    @Operation(summary = "批量删除目录(物理删除)", description = "永久删除目录记录，不可恢复")
+    ApiResponse<Integer> deleteDirectoriesPhysically(
+            @RequestBody @Validated DirectoriesDeleteRequest request,
+            @Parameter(description = "用户 ID") @RequestHeader("UID") UUID uid) {
+        return ApiResponse.success(directoryService.deleteDirectoriesPhysically(request.getDirectoryIds(), uid));
     }
 
     @PostMapping("/recover")

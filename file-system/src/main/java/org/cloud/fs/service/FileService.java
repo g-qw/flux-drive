@@ -28,6 +28,11 @@ public interface FileService {
     int deleteFiles(List<UUID> fileIds, UUID userId);
 
     /**
+     * 批量删除文件（物理删除）
+     */
+    int deleteFilesPhysically(List<UUID> fileIds, UUID userId);
+
+    /**
      * 批量恢复已删除文件
      */
     int recoverFiles(List<UUID> fileIds, UUID targetDirectoryId, UUID userId);

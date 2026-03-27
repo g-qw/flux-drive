@@ -118,6 +118,14 @@ public class FileController {
         return ApiResponse.success(fileService.deleteFiles(request.getFileIds(), uid));
     }
 
+    @PostMapping("/delete/physical")
+    @Operation(summary = "批量删除文件(物理删除)", description = "永久删除文件记录，不可恢复")
+    public ApiResponse<Integer> deleteFilesPhysically(
+            @RequestBody @Validated FilesDeleteRequest request,
+            @Parameter(description = "用户 ID") @RequestHeader("UID") UUID uid) {
+        return ApiResponse.success(fileService.deleteFilesPhysically(request.getFileIds(), uid));
+    }
+
     @PostMapping("/recover")
     @Operation(summary = "批量恢复文件", description = "将多个被删除的文件恢复至原位置，恢复文件前请确保文件所在目录未被删除")
     public ApiResponse<Integer> recoverFiles(

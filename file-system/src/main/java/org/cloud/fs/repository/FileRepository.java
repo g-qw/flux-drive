@@ -3,6 +3,7 @@ package org.cloud.fs.repository;
 import org.babyfish.jimmer.Page;
 import org.babyfish.jimmer.spring.repo.support.AbstractJavaRepository;
 import org.babyfish.jimmer.sql.JSqlClient;
+import org.babyfish.jimmer.sql.ast.mutation.DeleteMode;
 import org.babyfish.jimmer.sql.ast.mutation.SaveMode;
 import org.babyfish.jimmer.sql.ast.query.MutableRootQuery;
 import org.babyfish.jimmer.sql.runtime.LogicalDeletedBehavior;
@@ -94,6 +95,11 @@ public class FileRepository extends AbstractJavaRepository<File, UUID> {
                 .where(table.id().in(fileIds))
                 .where(table.userId().eq(userId))
                 .execute();
+    }
+
+    public int deleteFilesPhysically(List<UUID> fileIds) {
+        return sql.deleteByIds(File.class, fileIds, DeleteMode.PHYSICAL)
+                .getAffectedRowCount(File.class);
     }
 
     public int deleteFilesByDirectoryIds(List<UUID> directoryIds) {

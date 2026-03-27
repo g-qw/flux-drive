@@ -201,6 +201,7 @@ public class DirectoryServiceImpl implements DirectoryService {
 
     /**
      * 批量删除目录(软删除)
+     * Jimmer 会自动处理：级联删除所有子目录（递归）级联删除所有文件（包括子目录下的文件）
      *
      * @param directoryIds  被删除的目录的ID列表
      * @param userId        目录所属用户的 ID
@@ -211,36 +212,34 @@ public class DirectoryServiceImpl implements DirectoryService {
     public int deleteDirectories(List<UUID> directoryIds, UUID userId) {
         if(directoryIds.isEmpty())
             return 0;
-        
+
         // 权限校验
         if(directoryRepository.notOwns(userId, directoryIds)) {
             throw new AccessDeniedException();
         }
 
-        // 删除目录下的所有文件
-        int deletedFilesCount = fileRepository.deleteFilesByDirectoryIds(directoryIds);
-        
-        // 删除所有后代目录
-        List<UUID> subDirectoryIds = directoryRepository.listDescendantIds(directoryIds);
-        if(!subDirectoryIds.isEmpty()) {
-            directoryRepository.deleteDirectories(subDirectoryIds);
-
-            // 删除所有后代目录的文件
-            fileRepository.deleteFilesByDirectoryIds(subDirectoryIds);
-        }
-
-        // 如果为空目录
-        int affectedRowCount;
-        if(deletedFilesCount == 0 && subDirectoryIds.isEmpty()) {
-            affectedRowCount = directoryRepository.deleteDirectoriesPhysically(directoryIds);
-        } else {
-            // 软删除目录
-            affectedRowCount = directoryRepository.deleteDirectories(directoryIds);
-        }
+        int affectedRowCount = directoryRepository.deleteDirectories(directoryIds);
 
         log.debug("[deleteDirectories] directoryIds={}, userId={}", directoryIds, userId);
 
         return affectedRowCount;
+    }
+
+    /**
+     * 批量删除目录（物理删除）
+     * 非递归处理，仅用于清理软删除后过期的目录
+     *
+     * @param directoryIds  被删除的目录的ID列表
+     * @param userId        目录所属用户的 ID
+     * @return 删除成功的目录数量
+     */
+    public int deleteDirectoriesPhysically(List<UUID> directoryIds, UUID userId) {
+        // 权限校验
+        if(directoryRepository.notOwns(userId, directoryIds)) {
+            throw new AccessDeniedException();
+        }
+
+        return directoryRepository.deleteDirectoriesPhysically(directoryIds);
     }
 
     /**
