@@ -42,6 +42,11 @@ management:
       probes:
         enabled: true
 
+openapi:
+  local-url: http://localhost:${server.port}
+  test-url: ${OPENAPI_TEST_URL:http://localhost:75}
+  prod-url: ${OPENAPI_PROD_URL}
+
 # 日志配置
 logging:
   level:

@@ -17,11 +17,14 @@ import java.util.List;
 @Configuration
 public class OpenApiConfig {
 
-    @Value("${server.port:8104}")
-    private String serverPort;
+    @Value("${openapi.local-url}")
+    private String localUrl;
 
-    @Value("${gateway.port:75}")
-    private String gatewayPort;
+    @Value("${openapi.test-url}")
+    private String testUrl;
+
+    @Value("${openapi.prod-url}")
+    private String prodUrl;
 
     /**
      * 全局 OpenAPI 文档配置（不分组时的默认配置）
@@ -53,13 +56,13 @@ public class OpenApiConfig {
     private List<Server> servers() {
         return List.of(
                 new Server()
-                        .url("http://localhost:" + serverPort)
+                        .url(localUrl)
                         .description("本地开发环境"),
                 new Server()
-                        .url("http://localhost:" + gatewayPort)
+                        .url(testUrl)
                         .description("测试环境"),
                 new Server()
-                        .url("https://api.example.com")
+                        .url(prodUrl)
                         .description("生产环境")
         );
     }
