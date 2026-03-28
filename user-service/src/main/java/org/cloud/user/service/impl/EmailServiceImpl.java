@@ -103,6 +103,10 @@ public class EmailServiceImpl implements EmailService {
         boolean isValid = cachedCode.equals(code);
         if (isValid) {
             codeBucket.delete();
+
+            String requestKey = CACHE_KEY_FREQ_PREFIX + email;
+            RBucket<Integer> requestBucket = redisson.getBucket(requestKey);
+            requestBucket.delete();
         } else {
             log.warn("[verifyCode] email: {}, input: {}, cached: {} - mismatch", email, code, cachedCode);
             throw new BusinessException(400, "验证码错误");
@@ -120,12 +124,6 @@ public class EmailServiceImpl implements EmailService {
             helper.setSubject("Cloud Storage 邮箱验证");
             helper.setText(content, true);
             mailSender.send(msg);
-
-            // 设置 redis 缓存
-            String codeKey = CACHE_KEY_CODE_PREFIX + email;
-            redisson.getBucket(codeKey).set(code, VERIFICATION_CODE_TTL);
-            redisson.getBucket(CACHE_KEY_FREQ_PREFIX + email)
-                    .set(String.valueOf(System.currentTimeMillis()), VERIFICATION_CODE_TTL);
 
             long elapsedTime = System.currentTimeMillis() - startTime;
             log.info("[send] email={}, code={}, elapsed={}ms", email, code, elapsedTime);
