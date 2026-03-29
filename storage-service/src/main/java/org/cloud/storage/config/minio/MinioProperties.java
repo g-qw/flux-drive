@@ -24,17 +24,17 @@ public class MinioProperties {
     private String secretKey;
 
     /**
-     * 文件系统的存储桶
+     * 文件系统的存储桶（私有）
      */
     private String storageBucket = "default-storage";
 
     /**
-     * 媒体预览的存储桶
+     * 媒体预览的存储桶（私有）
      */
-    private String MidiaPreviewBucket = "media-preview";
+    private String mediaPreviewBucket = "media-preview";
 
     /**
-     * 头像的存储桶
+     * 头像的存储桶（仅公开读）
      */
     private String AvatarBucket = "avatar";
 
