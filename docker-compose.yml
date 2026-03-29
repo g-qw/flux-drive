@@ -63,7 +63,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - nacos_logs:/home/nacos/logs
-      - ./nacos/nacos-logback.xml:/home/nacos/conf/nacos-logback.xml:ro
+      - ./docker/nacos/nacos-logback.xml:/home/nacos/conf/nacos-logback.xml:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "8848:8848"
@@ -187,9 +187,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - ./nginx/dist:/usr/share/nginx/html:ro
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/nginx/dist:/usr/share/nginx/html:ro
       - /etc/localtime:/etc/localtime:ro
     networks:
       - backend-network
