@@ -115,7 +115,7 @@ public class GifScheduler {
         try (ByteArrayInputStream gifStream = new ByteArrayInputStream(gifBytes)) {
             minioClient.putObject(
                     PutObjectArgs.builder()
-                            .bucket(minioProperties.getMidiaPreviewBucket())
+                            .bucket(minioProperties.getMediaPreviewBucket())
                             .object(previewKey)
                             .stream(gifStream, gifBytes.length, -1)
                             .contentType("image/gif")
@@ -132,7 +132,7 @@ public class GifScheduler {
                         .fileId(task.fileId())
                         .userId(task.userId())
                         .md5(task.md5())
-                        .bucket(minioProperties.getMidiaPreviewBucket())
+                        .bucket(minioProperties.getMediaPreviewBucket())
                         .storageKey(previewKey)
                         .size((long) gifBytes.length)
                         .width(videoInfo.width())
