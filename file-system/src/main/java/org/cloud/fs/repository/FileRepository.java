@@ -225,6 +225,13 @@ public class FileRepository extends AbstractJavaRepository<File, UUID> {
                 .execute();
     }
 
+    public List<FileCleanupView> listFileCleanupViews(List<UUID> fileIds) {
+        return sql.createQuery(table)
+                .where(table.id().in(fileIds))
+                .select(table.fetch(FileCleanupView.class))
+                .execute();
+    }
+
     public Long sumSizeByDirectoryId(UUID directoryId) {
         Long totalSize = sql.createQuery(table)
                 .where(table.directoryId().eq(directoryId))

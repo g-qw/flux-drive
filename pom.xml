@@ -10,10 +10,10 @@
     </parent>
 
     <groupId>org.cloud</groupId>
-    <artifactId>cloud-storage-cluster</artifactId>
+    <artifactId>flux-drive</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>cloud-storage-cluster</name>
+    <name>flux-drive</name>
     <description>基于MinIO构建的Web云存储系统，旨在提供响应迅速、高性能和高并发的存储和浏览体验。</description>
     <url/>
 

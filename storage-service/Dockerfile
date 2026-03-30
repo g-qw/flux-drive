@@ -17,6 +17,11 @@ COPY dubbo-api/pom.xml dubbo-api/
 COPY dubbo-api/src dubbo-api/src/
 RUN mvn clean install -DskipTests -B -f dubbo-api/pom.xml
 
+# amqp-api
+COPY amqp-api/pom.xml amqp-api/
+COPY amqp-api/src amqp-api/src
+RUN mvn clean install -DskipTests -B -f amqp-api/pom.xml
+
 # storage-service 依赖
 COPY storage-service/pom.xml storage-service/
 RUN mvn dependency:resolve -B -f storage-service/pom.xml

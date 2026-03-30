@@ -21,6 +21,18 @@ spring:
       password: ${REDIS_PASSWORD}
       database: 2
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USERNAME:admin}
+    password: ${RABBITMQ_PASSWORD:rabbitmq}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    listener:
+      simple:
+        concurrency: 8
+        max-concurrency: 16
+        prefetch: 8
+
 dubbo:
   application:
     name: ${spring.application.name}-dubbo

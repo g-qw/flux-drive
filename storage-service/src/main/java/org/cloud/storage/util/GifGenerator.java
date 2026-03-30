@@ -197,7 +197,7 @@ public class GifGenerator {
      * 设置场景切换时的帧延迟
      * 策略：
      * - 非最后一个场景：停顿让用户看清内容
-     * - 最后一个场景：停顿减半（，形成流畅循环过渡
+     * - 最后一个场景：停顿减半，形成流畅循环过渡
      *
      * @param encoder GIF 编码器
      * @param sceneIdx 当前场景索引

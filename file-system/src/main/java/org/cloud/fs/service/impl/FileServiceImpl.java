@@ -11,10 +11,16 @@ import org.cloud.fs.exception.InvalidFileNameException;
 import org.cloud.fs.repository.DirectoryRepository;
 import org.cloud.fs.repository.FileRepository;
 import org.cloud.fs.service.FileService;
+import org.cloud.message.constant.ExchangeConstants;
+import org.cloud.message.constant.RoutingKeyConstants;
+import org.cloud.message.dto.FileCleanupMessage;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,6 +31,7 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
     private final DirectoryRepository directoryRepository;
     private final FileRepository fileRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     /**
      * 创建新文件
@@ -97,18 +104,58 @@ public class FileServiceImpl implements FileService {
     }
 
     /**
-     * 批量删除文件（物理删除）
+     * 批量删除文件（物理删除），文件blob异步删除
      *
      * @param fileIds 文件ID列表
      * @param userId  文件所属用户的 ID
      * @return 成功删除的文件数量
      */
+    @Transactional
     public int deleteFilesPhysically(List<UUID> fileIds, UUID userId) {
-        if(fileRepository.notOwns(userId, fileIds)) {
+        if (fileRepository.notOwns(userId, fileIds)) {
             throw new AccessDeniedException();
         }
 
-        return fileRepository.deleteFilesPhysically(fileIds);
+        List<FileCleanupView> cleanupViews = fileRepository.listFileCleanupViews(fileIds);
+        if (cleanupViews.isEmpty()) {
+            return 0;
+        }
+
+        // 先发消息，记录发送成功的文件ID
+        List<UUID> sentFileIds = new ArrayList<>();
+        for (FileCleanupView file : cleanupViews) {
+            try {
+                FileCleanupMessage message = new FileCleanupMessage(
+                        file.getId(),
+                        file.getBucket(),
+                        file.getStorageKey(),
+                        System.currentTimeMillis()
+                );
+
+                rabbitTemplate.convertAndSend(
+                        ExchangeConstants.FILE_EXCHANGE,
+                        RoutingKeyConstants.FILE_DELETE_ROUTING_KEY,
+                        message,
+                        // 添加消息ID用于去重
+                        msg -> {
+                            msg.getMessageProperties().setMessageId(file.getId().toString());
+                            return msg;
+                        }
+                );
+
+                sentFileIds.add(file.getId());
+
+            } catch (AmqpException e) {
+                log.error("Send file delete message failed, fileId={}, skip DB deletion", file.getId(), e);
+            }
+        }
+
+
+        int affectedRowCount = fileRepository.deleteFilesPhysically(sentFileIds);
+        log.info("[deleteFilesPhysically] sent={}, deleted={}, total={}, userId={}",
+                sentFileIds.size(), affectedRowCount, cleanupViews.size(), userId);
+
+        return affectedRowCount;
     }
 
     /**

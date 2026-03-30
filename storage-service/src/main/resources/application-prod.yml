@@ -24,6 +24,18 @@ spring:
   codec:
     max-in-memory-size: 32MB
 
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    listener:
+      simple:
+        concurrency: 8
+        max-concurrency: 16
+        prefetch: 8
+
 dubbo:
   application:
     name: ${spring.application.name}-dubbo

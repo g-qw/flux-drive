@@ -18,6 +18,12 @@ DeletedFileView {
     deletedAt
 }
 
+FileCleanupView {
+    id
+    bucket
+    storageKey
+}
+
 input FileInput {
     directoryId
     bucket
