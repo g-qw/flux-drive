@@ -14,19 +14,27 @@ declare -A SERVICE_MAP=(
 # 定义共享模块
 SHARED_MODULES=("dubbo-api" "amqp-api" "pom.xml" "docker-compose.yml")
 
+# 获取 pull 前的 commit hash
+OLD_COMMIT=$(git rev-parse HEAD)
+
 # Git pull 并获取变更文件
 OUTPUT=$(git pull 2>&1)
 echo "[$(date)] Git output:"
 echo "$OUTPUT"
 
-# 检查是否有更新
-if echo "$OUTPUT" | grep -q "Already up to date"; then
+# 获取 pull 后的 commit hash
+NEW_COMMIT=$(git rev-parse HEAD)
+
+# 比较 commit hash，检查是否有更新
+if [ "$OLD_COMMIT" = "$NEW_COMMIT" ]; then
     echo "No changes, exit"
     exit 0
 fi
 
-# 提取变更的文件列表
-CHANGED_FILES=$(git diff --name-only HEAD@{1} HEAD 2>/dev/null || git diff --name-only HEAD~1 HEAD)
+echo "[$(date)] Updated from $OLD_COMMIT to $NEW_COMMIT"
+
+# 对比 pull 前后的确切变化，提取变更的文件列表
+CHANGED_FILES=$(git diff --name-only "$OLD_COMMIT" "$NEW_COMMIT")
 
 echo "[$(date)] Changed files:"
 echo "$CHANGED_FILES"
