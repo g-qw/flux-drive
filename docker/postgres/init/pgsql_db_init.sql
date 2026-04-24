@@ -1,3 +1,6 @@
+-- 启用 pgvector 扩展
+CREATE EXTENSION IF NOT EXISTS vector;
+
 -- 触发器，自动更新 updated_at 字段
 CREATE OR REPLACE FUNCTION update_updated_at_column()
     RETURNS TRIGGER AS $$
