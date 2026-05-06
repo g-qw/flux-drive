@@ -68,6 +68,7 @@ jwt:
 app:
   cors:
     allowed-origins:
+      - "https://326325.xyz"
       - "http://326325.xyz"
       - "http://localhost"
       - "http://localhost:75"
