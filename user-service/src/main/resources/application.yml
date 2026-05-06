@@ -6,6 +6,9 @@ spring:
     name: user-service
   profiles:
     active: dev
+  config:
+    import:
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
 
 jimmer:
   dialect: org.babyfish.jimmer.sql.dialect.PostgresDialect

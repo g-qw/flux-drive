@@ -9,6 +9,9 @@ spring:
     web-application-type: reactive
   application:
     name: gateway
+  config:
+    import:
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
   thymeleaf:
     cache: true
   cloud:

@@ -8,6 +8,9 @@ spring:
     web-application-type: reactive
   profiles:
     default: dev
+  config:
+    import:
+      - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
 
 springdoc:
   api-docs:
