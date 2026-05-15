@@ -30,7 +30,8 @@ public class PreviewServiceImpl implements PreviewService {
 
     @Override
     public List<MediaCoverDTO> getMediaCovers(List<String> fileHashes, UUID userId) {
-        return mediaCoverRepository.listByFileHashes(fileHashes, userId).stream()
+        return mediaCoverRepository.listByFileHashes(fileHashes, userId)
+                .stream()
                 .map(this::buildMediaCoverDTO)
                 .toList();
     }
@@ -46,7 +47,7 @@ public class PreviewServiceImpl implements PreviewService {
             file -> {
                 String presignedUrl;
                 try {
-                    presignedUrl = minioService.getPresignedUrl(file.getBucket(), file.getStorageKey(), Method.GET, minioProperties.getPresignedExpiry());
+                    presignedUrl = minioService.getExternalPresignedUrl(file.getBucket(), file.getStorageKey(), Method.GET, minioProperties.getPresignedExpiry());
                 } catch (Exception e) {
                     return null;
                 }
@@ -62,7 +63,7 @@ public class PreviewServiceImpl implements PreviewService {
     private MediaCoverDTO buildMediaCoverDTO(MediaCover mediaCover) {
         return MediaCoverDTO.builder()
                 .md5(mediaCover.md5())
-                .url(String.format("%s/%s/%s", minioProperties.getBaseUrl(), mediaCover.bucket(), mediaCover.storageKey()))
+                .url(minioService.getExternalPresignedUrl(mediaCover.bucket(), mediaCover.storageKey(), Method.GET, minioProperties.getPresignedExpiry()))
                 .width(mediaCover.width())
                 .height(mediaCover.height())
                 .build();

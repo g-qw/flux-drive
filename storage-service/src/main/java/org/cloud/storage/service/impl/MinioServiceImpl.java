@@ -27,7 +27,7 @@ public class MinioServiceImpl implements MinioService {
     private static final double REFRESH_THRESHOLD = 0.2;
 
     @Override
-    public String getPresignedUrl(String bucket, String object, Method method, int expirySeconds) {
+    public String getExternalPresignedUrl(String bucket, String object, Method method, int expirySeconds) {
         String cacheKey = buildCacheKey(CACHE_PREFIX, bucket, object, method);
         RBucket<String> bucketCache = redissonClient.getBucket(cacheKey);
 
@@ -45,6 +45,33 @@ public class MinioServiceImpl implements MinioService {
 
         log.debug("Generated presigned url: url={}, cacheKey={}, cacheTTL={}s", presignedUrl, cacheKey, cacheTtl);
         return presignedUrl;
+    }
+
+    /**
+     * 获取内部访问URL（供微服务间调用使用）
+     */
+    @Override
+    public String getInternalPresignedUrl(String bucket, String object, Method method, int expirySeconds) {
+        return generateInternalPresignedUrl(bucket, object, method, expirySeconds);
+    }
+
+    /**
+     * 生成内部访问的预签名 URL
+     */
+    private String generateInternalPresignedUrl(String bucket, String object, Method method, int expirySeconds) {
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(method)
+                            .bucket(bucket)
+                            .object(object)
+                            .expiry(expirySeconds, TimeUnit.SECONDS)
+                            .build()
+            );
+        } catch (Exception e) {
+            log.error("Failed to generate internal presigned URL: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     /**
