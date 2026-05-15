@@ -4,23 +4,12 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  cloud:
-    nacos:
-      server-addr: nacos:8848
-      discovery:
-        service: ${spring.application.name}
-      config:
-        file-extension: yaml
-        group: DEFAULT_GROUP
-        import-check:
-          enabled: false
   data:
     redis:
       host: redis
       port: 6379
       password: ${REDIS_PASSWORD}
       database: 2
-
   rabbitmq:
     host: rabbitmq
     port: 5672

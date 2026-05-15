@@ -212,6 +212,7 @@ services:
     container_name: gateway
     restart: unless-stopped
     environment:
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       TZ: Asia/Shanghai
@@ -256,6 +257,7 @@ services:
     container_name: user-service
     restart: unless-stopped
     environment:
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -307,6 +309,7 @@ services:
     container_name: file-system
     restart: unless-stopped
     environment:
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -361,6 +364,7 @@ services:
     container_name: storage-service
     restart: unless-stopped
     environment:
+      NACOS_SERVER_ADDR: ${NACOS_SERVER_ADDR}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

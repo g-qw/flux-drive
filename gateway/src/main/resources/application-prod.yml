@@ -1,14 +1,4 @@
 spring:
-  cloud:
-    nacos:
-      server-addr: nacos:8848
-      discovery:
-        service: ${spring.application.name}
-      config:
-        file-extension: yaml
-        group: DEFAULT_GROUP
-        import-check:
-          enabled: false
   data:
     redis:
       host: redis

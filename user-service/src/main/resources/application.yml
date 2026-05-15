@@ -6,6 +6,16 @@ spring:
     name: user-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+      discovery:
+        service: ${spring.application.name}
+      config:
+        file-extension: yaml
+        group: DEFAULT_GROUP
+        import-check:
+          enabled: false
   config:
     import:
       - optional:nacos:${spring.application.name}-${spring.profiles.active}.yaml
