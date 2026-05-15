@@ -150,7 +150,6 @@ public class FileServiceImpl implements FileService {
             }
         }
 
-
         int affectedRowCount = fileRepository.deleteFilesPhysically(sentFileIds);
         log.info("[deleteFilesPhysically] sent={}, deleted={}, total={}, userId={}",
                 sentFileIds.size(), affectedRowCount, cleanupViews.size(), userId);
